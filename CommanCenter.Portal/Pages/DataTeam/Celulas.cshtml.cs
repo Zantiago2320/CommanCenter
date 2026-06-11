@@ -77,6 +77,30 @@ public class CelulasModel : PageModel
         return RedirectToPage();
     }
 
+    public async Task<IActionResult> OnPostEliminarAsync(int id)
+    {
+        if (!(User.IsInRole("Admin") || User.IsInRole("Supervisor")))
+        {
+            TempData["Error"] = "No tiene permisos para eliminar células.";
+            return RedirectToPage();
+        }
+
+        var token = HttpContext.Session.GetString("jwt_token");
+        var result = await _api.DeleteAsync<bool>($"api/celulas/{id}", token);
+
+        if (result?.Exitoso == true)
+        {
+            _logger.LogInformation("Célula {Id} eliminada (deshabilitada) desde el Portal", id);
+            TempData["Success"] = "Célula eliminada correctamente.";
+        }
+        else
+        {
+            TempData["Error"] = result?.Mensaje ?? "No se pudo eliminar la célula.";
+        }
+
+        return RedirectToPage();
+    }
+
     /// <summary>
     /// Sube la imagen (Blob Storage o local) y devuelve la URL pública.
     /// </summary>

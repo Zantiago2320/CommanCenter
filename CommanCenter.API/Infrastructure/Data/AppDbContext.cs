@@ -27,13 +27,24 @@ public class AppDbContext : IdentityDbContext
         {
             e.ToTable("Consultores");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Cedula).HasMaxLength(30);
             e.Property(x => x.Nombre).HasMaxLength(100).IsRequired();
             e.Property(x => x.Apellido).HasMaxLength(100).IsRequired();
             e.Property(x => x.Email).HasMaxLength(200).IsRequired();
             e.HasIndex(x => x.Email).IsUnique();
+            e.Property(x => x.Telefono).HasMaxLength(20);
+            e.Property(x => x.Celular).HasMaxLength(20);
             e.Property(x => x.Cargo).HasMaxLength(150);
+            e.Property(x => x.Rol).HasMaxLength(100);
             e.Property(x => x.Tecnologia).HasMaxLength(100);
             e.Property(x => x.NivelSeniority).HasMaxLength(50);
+            e.Property(x => x.Capacidad).HasMaxLength(50);
+            e.Property(x => x.Empresa).HasMaxLength(150);
+            e.Property(x => x.Direccion).HasMaxLength(250);
+            e.Property(x => x.Barrio).HasMaxLength(100);
+            e.Property(x => x.ContactoEmergenciaNombre).HasMaxLength(150);
+            e.Property(x => x.ContactoEmergenciaTelefono).HasMaxLength(20);
+            e.Property(x => x.Estado).HasMaxLength(20).IsRequired().HasDefaultValue("Activo");
             e.Property(x => x.MotivoDeshabilitacion).HasMaxLength(500);
             e.HasQueryFilter(x => x.Activo);
         });

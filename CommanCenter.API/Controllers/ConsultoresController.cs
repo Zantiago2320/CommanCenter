@@ -21,13 +21,13 @@ public class ConsultoresController : ControllerBase
 
     /// <summary>Obtiene todos los consultores habilitados.</summary>
     [HttpGet]
-    [Authorize(Roles = "SuperAdmin,Admin,Lider,User")]
+    [Authorize(Roles = "Admin,Supervisor,Senior")]
     public async Task<IActionResult> GetAll() =>
         Ok(await _service.GetAllAsync());
 
     /// <summary>Obtiene los consultores deshabilitados (no eliminados).</summary>
     [HttpGet("deshabilitados")]
-    [Authorize(Roles = "SuperAdmin,Admin,Lider")]
+    [Authorize(Roles = "Admin,Supervisor,Senior")]
     public async Task<IActionResult> GetDeshabilitados() =>
         Ok(await _service.GetDeshabilitadosAsync());
 
@@ -46,7 +46,7 @@ public class ConsultoresController : ControllerBase
 
     /// <summary>Crea un nuevo consultor.</summary>
     [HttpPost]
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> Crear([FromBody] CrearConsultorDto dto)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
@@ -56,7 +56,7 @@ public class ConsultoresController : ControllerBase
 
     /// <summary>Actualiza un consultor existente.</summary>
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> Actualizar(int id, [FromBody] ActualizarConsultorDto dto)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
@@ -66,7 +66,7 @@ public class ConsultoresController : ControllerBase
 
     /// <summary>Deshabilita un consultor (soft disable) indicando el motivo.</summary>
     [HttpPatch("{id:int}/deshabilitar")]
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> Deshabilitar(int id, [FromBody] DeshabilitarConsultorDto dto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -77,7 +77,7 @@ public class ConsultoresController : ControllerBase
 
     /// <summary>Rehabilita un consultor previamente deshabilitado.</summary>
     [HttpPatch("{id:int}/rehabilitar")]
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> Rehabilitar(int id)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
@@ -87,7 +87,7 @@ public class ConsultoresController : ControllerBase
 
     /// <summary>Elimina lógicamente un consultor.</summary>
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Eliminar(int id)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";

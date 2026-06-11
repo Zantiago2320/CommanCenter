@@ -4,15 +4,15 @@ using CommanCenter.API.Application.DTOs.Common;
 using CommanCenter.API.Domain.Entities;
 using CommanCenter.API.Domain.Interfaces;
 using CommanCenter.API.Infrastructure.Data;
+using CommanCenter.API.Infrastructure.Jobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommanCenter.API.Controllers;
 
 /// <summary>
-/// Envío de notificaciones por correo (SendGrid).
-/// Aquí solo se define el "cableado": el destinatario se recibe en la petición.
-/// Para enviar a una persona, basta con poner su correo en "To".
+/// Envío de notificaciones por correo.
+/// El envío manual de correos está reservado a Admin y Senior.
 /// </summary>
 [ApiController]
 [Route("api/notifications")]
@@ -21,15 +21,18 @@ namespace CommanCenter.API.Controllers;
 public class NotificationsController : ControllerBase
 {
     private readonly INotificationService _notification;
+    private readonly NotificationJobs _jobs;
     private readonly AppDbContext _db;
     private readonly ILogger<NotificationsController> _logger;
 
     public NotificationsController(
         INotificationService notification,
+        NotificationJobs jobs,
         AppDbContext db,
         ILogger<NotificationsController> logger)
     {
         _notification = notification;
+        _jobs = jobs;
         _db = db;
         _logger = logger;
     }
@@ -39,7 +42,7 @@ public class NotificationsController : ControllerBase
     /// El (los) destinatario(s) se define(n) en el campo "To" del cuerpo de la petición.
     /// </summary>
     [HttpPost("email")]
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    [Authorize(Roles = "Admin,Senior")]
     public async Task<IActionResult> EnviarEmail([FromBody] SendEmailRequest request)
     {
         if (!ModelState.IsValid)
@@ -114,6 +117,34 @@ public class NotificationsController : ControllerBase
             destinatarios.Count == 1
                 ? "Correo enviado correctamente."
                 : $"Correo enviado a {destinatarios.Count} destinatarios."));
+    }
+
+    /// <summary>
+    /// Envía manualmente el recordatorio con los cumpleaños del mes actual
+    /// a los destinatarios configurados en appsettings (Notificaciones).
+    /// </summary>
+    [HttpPost("cumpleanios-mes")]
+    [Authorize(Roles = "Admin,Senior")]
+    public async Task<IActionResult> EnviarCumpleaniosDelMes()
+    {
+        var usuarioId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
+        await _jobs.EnviarRecordatorioCumpleaniosDelMesAsync();
+        _logger.LogInformation("Recordatorio de cumpleaños del mes enviado manualmente por {Usuario}", usuarioId);
+        return Ok(ApiResponse<bool>.Ok(true, "Recordatorio de cumpleaños del mes enviado a los destinatarios configurados."));
+    }
+
+    /// <summary>
+    /// Envía manualmente el reporte mensual con los trabajadores actuales
+    /// a los destinatarios configurados en appsettings (Notificaciones).
+    /// </summary>
+    [HttpPost("reporte-mensual")]
+    [Authorize(Roles = "Admin,Senior")]
+    public async Task<IActionResult> EnviarReporteMensual()
+    {
+        var usuarioId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
+        await _jobs.EnviarReporteMensualAsync();
+        _logger.LogInformation("Reporte mensual enviado manualmente por {Usuario}", usuarioId);
+        return Ok(ApiResponse<bool>.Ok(true, "Reporte mensual enviado a los destinatarios configurados."));
     }
 
     /// <summary>Obtiene el historial de notificaciones enviadas a un destinatario (por correo).</summary>

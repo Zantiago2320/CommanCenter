@@ -93,17 +93,18 @@ app.UseHangfireDashboard(
 
 // ── Jobs recurrentes (correos automáticos) ──────────────────────────────────
 // CRON: "min hora día-del-mes mes día-de-la-semana" (hora del servidor, UTC).
-// Recordatorio de cumpleaños del mes: el día 1 de cada mes a las 08:00.
+// Recordatorio de cumpleaños del mes: se ejecuta los primeros días del mes a las 08:00
+// y el propio job sólo envía si es el PRIMER DÍA HÁBIL del mes.
 RecurringJob.AddOrUpdate<CommanCenter.API.Infrastructure.Jobs.NotificationJobs>(
     "recordatorio-cumpleanios-mes",
-    job => job.EnviarRecordatorioCumpleaniosDelMesAsync(),
-    "0 8 1 * *");
+    job => job.EnviarRecordatorioCumpleaniosPrimerDiaHabilAsync(),
+    "0 8 1-3 * *");
 
-// Reporte mensual del equipo: el día 1 de cada mes a las 08:30.
+// Reporte mensual del equipo: el día 15 de cada mes a las 08:30.
 RecurringJob.AddOrUpdate<CommanCenter.API.Infrastructure.Jobs.NotificationJobs>(
     "reporte-mensual",
     job => job.EnviarReporteMensualAsync(),
-    "30 8 1 * *");
+    "30 8 15 * *");
 
 app.MapControllers();
 
@@ -114,7 +115,7 @@ app.Run();
 // ── Seed inicial ───────────────────────────────────────────────────────────
 static async Task SeedAsync(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
 {
-    string[] roles = ["SuperAdmin", "Admin", "Lider", "User"];
+    string[] roles = ["Admin", "Supervisor", "Senior"];
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
@@ -122,9 +123,10 @@ static async Task SeedAsync(RoleManager<IdentityRole> roleManager, UserManager<I
     }
 
     // Usuarios iniciales: se inicia sesión con el NOMBRE de usuario (no con correo).
-    await CrearUsuarioAsync(userManager, "alexander", "Alexander@123", "SuperAdmin");
-    await CrearUsuarioAsync(userManager, "sergio", "Sergio@123", "SuperAdmin");
-    await CrearUsuarioAsync(userManager, "lider", "Lider@123", "Lider");
+    await CrearUsuarioAsync(userManager, "alexander", "Alexander@123", "Admin");
+    await CrearUsuarioAsync(userManager, "sergio", "Sergio@123", "Admin");
+    await CrearUsuarioAsync(userManager, "supervisor", "Supervisor@123", "Supervisor");
+    await CrearUsuarioAsync(userManager, "senior", "Senior@123", "Senior");
 }
 
 // Crea un usuario por nombre (sin correo) y le asigna un rol, si no existe.

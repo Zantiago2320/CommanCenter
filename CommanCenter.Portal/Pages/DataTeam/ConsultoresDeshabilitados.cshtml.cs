@@ -6,7 +6,7 @@ using CommanCenter.Portal.Services;
 
 namespace CommanCenter.Portal.Pages.DataTeam;
 
-[Authorize(Roles = "SuperAdmin,Admin,Lider")]
+[Authorize(Roles = "Admin,Supervisor,Senior")]
 public class ConsultoresDeshabilitadosModel : PageModel
 {
     private readonly IApiClient _api;

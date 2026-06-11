@@ -72,13 +72,23 @@ public class ConsultorService : IConsultorService
 
             var consultor = new Consultor
             {
+                Cedula = dto.Cedula?.Trim(),
                 Nombre = dto.Nombre.Trim(),
                 Apellido = dto.Apellido.Trim(),
                 Email = dto.Email.Trim().ToLower(),
                 Telefono = dto.Telefono,
+                Celular = dto.Celular,
                 Cargo = dto.Cargo,
+                Rol = dto.Rol,
                 Tecnologia = dto.Tecnologia,
                 NivelSeniority = dto.NivelSeniority,
+                Capacidad = dto.Capacidad,
+                Empresa = dto.Empresa,
+                Direccion = dto.Direccion,
+                Barrio = dto.Barrio,
+                ContactoEmergenciaNombre = dto.ContactoEmergenciaNombre,
+                ContactoEmergenciaTelefono = dto.ContactoEmergenciaTelefono,
+                Estado = string.IsNullOrWhiteSpace(dto.Estado) ? "Activo" : dto.Estado.Trim(),
                 FechaIngreso = dto.FechaIngreso,
                 FechaNacimiento = dto.FechaNacimiento,
                 Observaciones = dto.Observaciones,
@@ -119,13 +129,23 @@ public class ConsultorService : IConsultorService
 
         var anterior = $"{consultor.Nombre} {consultor.Apellido}";
 
+        consultor.Cedula = dto.Cedula?.Trim();
         consultor.Nombre = dto.Nombre.Trim();
         consultor.Apellido = dto.Apellido.Trim();
         consultor.Email = dto.Email.Trim().ToLower();
         consultor.Telefono = dto.Telefono;
+        consultor.Celular = dto.Celular;
         consultor.Cargo = dto.Cargo;
+        consultor.Rol = dto.Rol;
         consultor.Tecnologia = dto.Tecnologia;
         consultor.NivelSeniority = dto.NivelSeniority;
+        consultor.Capacidad = dto.Capacidad;
+        consultor.Empresa = dto.Empresa;
+        consultor.Direccion = dto.Direccion;
+        consultor.Barrio = dto.Barrio;
+        consultor.ContactoEmergenciaNombre = dto.ContactoEmergenciaNombre;
+        consultor.ContactoEmergenciaTelefono = dto.ContactoEmergenciaTelefono;
+        consultor.Estado = string.IsNullOrWhiteSpace(dto.Estado) ? "Activo" : dto.Estado.Trim();
         consultor.FechaIngreso = dto.FechaIngreso;
         consultor.FechaNacimiento = dto.FechaNacimiento;
         consultor.Habilitado = dto.Habilitado;
@@ -228,17 +248,28 @@ public class ConsultorService : IConsultorService
     private static ConsultorDto MapToDto(Consultor c) => new()
     {
         Id = c.Id,
+        Cedula = c.Cedula,
         Nombre = c.Nombre,
         Apellido = c.Apellido,
         Email = c.Email,
         Telefono = c.Telefono,
+        Celular = c.Celular,
         Cargo = c.Cargo,
+        Rol = c.Rol,
         Tecnologia = c.Tecnologia,
         NivelSeniority = c.NivelSeniority,
+        Capacidad = c.Capacidad,
+        Empresa = c.Empresa,
+        Direccion = c.Direccion,
+        Barrio = c.Barrio,
+        ContactoEmergenciaNombre = c.ContactoEmergenciaNombre,
+        ContactoEmergenciaTelefono = c.ContactoEmergenciaTelefono,
+        Estado = c.Estado,
         FechaIngreso = c.FechaIngreso,
         FechaNacimiento = c.FechaNacimiento,
         Habilitado = c.Habilitado,
         FotoUrl = c.FotoUrl,
+        Observaciones = c.Observaciones,
         FechaCreacion = c.FechaCreacion,
         MotivoDeshabilitacion = c.MotivoDeshabilitacion,
         FechaDeshabilitacion = c.FechaDeshabilitacion,

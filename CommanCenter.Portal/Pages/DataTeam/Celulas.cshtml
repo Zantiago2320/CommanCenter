@@ -72,6 +72,14 @@
                        class="btn btn-sm btn-outline-primary w-100">
                         <i class="bi bi-gear me-1"></i>Gestionar miembros y líder
                     </a>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+                    {
+                        <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-2"
+                                data-bs-toggle="modal" data-bs-target="#modalEliminarCelula"
+                                data-id="@celula.Id" data-nombre="@celula.Nombre">
+                            <i class="bi bi-trash me-1"></i>Eliminar célula
+                        </button>
+                    }
                 </div>
             </div>
         </div>
@@ -118,3 +126,42 @@
         </div>
     </div>
 </div>
+
+<!-- Modal: Eliminar Célula -->
+<div class="modal fade" id="modalEliminarCelula" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" asp-page-handler="Eliminar">
+            @Html.AntiForgeryToken()
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Eliminar célula</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="eliminarCelulaId" />
+                    <p class="mb-0">
+                        ¿Seguro que desea eliminar la célula <strong id="eliminarCelulaNombre"></strong>?
+                        La célula quedará deshabilitada (no se borra físicamente).
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Confirmar eliminación
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const modalEliminarCelula = document.getElementById('modalEliminarCelula');
+        modalEliminarCelula?.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            document.getElementById('eliminarCelulaId').value = button.getAttribute('data-id');
+            document.getElementById('eliminarCelulaNombre').textContent = button.getAttribute('data-nombre');
+        });
+    </script>
+}

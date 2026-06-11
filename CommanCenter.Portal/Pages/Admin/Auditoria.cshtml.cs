@@ -5,7 +5,7 @@ using CommanCenter.Portal.Services;
 
 namespace CommanCenter.Portal.Pages.Admin;
 
-[Authorize(Roles = "SuperAdmin,Admin")]
+[Authorize(Roles = "Admin")]
 public class AuditoriaModel : PageModel
 {
     private readonly IApiClient _api;

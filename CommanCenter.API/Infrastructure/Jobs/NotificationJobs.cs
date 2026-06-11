@@ -148,4 +148,31 @@ public class NotificationJobs
         _logger.LogInformation("Job reporte mensual: {Cantidad} trabajadores, enviado a {Destinatarios} destinatarios.",
             habilitados.Count, destinatarios.Length);
     }
+
+    /// <summary>
+    /// Job programado: envía el recordatorio de cumpleaños del mes SOLO si hoy
+    /// es el primer día hábil del mes (lunes a viernes). Se programa para correr
+    /// los primeros días del mes; si no es el primer día hábil, no hace nada.
+    /// </summary>
+    public async Task EnviarRecordatorioCumpleaniosPrimerDiaHabilAsync()
+    {
+        var hoy = DateTime.UtcNow.Date;
+        if (!EsPrimerDiaHabilDelMes(hoy))
+        {
+            _logger.LogInformation("Job cumpleaños programado: hoy {Fecha} no es el primer día hábil del mes. No se envía.", hoy);
+            return;
+        }
+
+        await EnviarRecordatorioCumpleaniosDelMesAsync();
+    }
+
+    /// <summary>Determina si la fecha dada es el primer día hábil (lunes a viernes) del mes.</summary>
+    private static bool EsPrimerDiaHabilDelMes(DateTime fecha)
+    {
+        var primerDiaHabil = new DateTime(fecha.Year, fecha.Month, 1);
+        while (primerDiaHabil.DayOfWeek == DayOfWeek.Saturday || primerDiaHabil.DayOfWeek == DayOfWeek.Sunday)
+            primerDiaHabil = primerDiaHabil.AddDays(1);
+
+        return fecha.Date == primerDiaHabil.Date;
+    }
 }

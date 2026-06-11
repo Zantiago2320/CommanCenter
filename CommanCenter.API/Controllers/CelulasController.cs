@@ -34,7 +34,7 @@ public class CelulasController : ControllerBase
 
     /// <summary>Crea una nueva célula.</summary>
     [HttpPost]
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> Crear([FromBody] CrearCelulaDto dto)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
@@ -44,7 +44,7 @@ public class CelulasController : ControllerBase
 
     /// <summary>Actualiza una célula.</summary>
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> Actualizar(int id, [FromBody] ActualizarCelulaDto dto)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
@@ -54,7 +54,7 @@ public class CelulasController : ControllerBase
 
     /// <summary>Elimina lógicamente una célula.</summary>
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> Eliminar(int id)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
@@ -64,7 +64,7 @@ public class CelulasController : ControllerBase
 
     /// <summary>Asigna un consultor como miembro de una célula.</summary>
     [HttpPost("{celulaId:int}/miembros/{consultorId:int}")]
-    [Authorize(Roles = "SuperAdmin,Admin,Lider")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> AsignarMiembro(int celulaId, int consultorId)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
@@ -74,7 +74,7 @@ public class CelulasController : ControllerBase
 
     /// <summary>Remueve un consultor de una célula.</summary>
     [HttpDelete("{celulaId:int}/miembros/{consultorId:int}")]
-    [Authorize(Roles = "SuperAdmin,Admin,Lider")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> RemoverMiembro(int celulaId, int consultorId)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";
@@ -84,7 +84,7 @@ public class CelulasController : ControllerBase
 
     /// <summary>Asigna un líder a una célula.</summary>
     [HttpPost("{celulaId:int}/lider/{consultorId:int}")]
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> AsignarLider(int celulaId, int consultorId)
     {
         var userId = User.FindFirstValue(ClaimTypes.Name) ?? "system";

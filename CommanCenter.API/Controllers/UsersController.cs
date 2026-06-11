@@ -14,7 +14,7 @@ namespace CommanCenter.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/users")]
-[Authorize(Roles = "SuperAdmin,Admin")]
+[Authorize(Roles = "Admin")]
 [Produces("application/json")]
 public class UsersController : ControllerBase
 {
@@ -126,7 +126,7 @@ public class UsersController : ControllerBase
 
     /// <summary>Elimina un usuario.</summary>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Eliminar(string id)
     {
         var ejecutor = User.FindFirstValue(ClaimTypes.Name) ?? "system";

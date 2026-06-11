@@ -100,7 +100,7 @@ else
                                     @(c.FechaDeshabilitacion?.ToString("yyyy-MM-dd HH:mm") ?? "—")
                                 </td>
                                 <td class="text-end">
-                                    @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
                                     {
                                         <form method="post" asp-page-handler="Rehabilitar" class="d-inline"
                                               onsubmit="return confirm('¿Rehabilitar a @c.NombreCompleto?');">

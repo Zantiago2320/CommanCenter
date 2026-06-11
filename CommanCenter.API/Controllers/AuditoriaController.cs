@@ -10,7 +10,7 @@ namespace CommanCenter.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/auditoria")]
-[Authorize(Roles = "SuperAdmin,Admin")]
+[Authorize(Roles = "Admin")]
 [Produces("application/json")]
 public class AuditoriaController : ControllerBase
 {

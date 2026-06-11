@@ -21,29 +21,56 @@
         <form method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <label class="form-label">Cédula <span class="text-danger">*</span></label>
+                    <input asp-for="Input.Cedula" class="form-control" required maxlength="30" />
+                    <span asp-validation-for="Input.Cedula" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
                     <label class="form-label">Nombre <span class="text-danger">*</span></label>
                     <input asp-for="Input.Nombre" class="form-control" required maxlength="100" />
+                    <span asp-validation-for="Input.Nombre" class="text-danger small"></span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label">Apellido <span class="text-danger">*</span></label>
                     <input asp-for="Input.Apellido" class="form-control" required maxlength="100" />
+                    <span asp-validation-for="Input.Apellido" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Email <span class="text-danger">*</span></label>
                     <input asp-for="Input.Email" type="email" class="form-control" required />
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
+                    <label class="form-label">Celular <span class="text-danger">*</span></label>
+                    <input asp-for="Input.Celular" class="form-control" required maxlength="20" />
+                    <span asp-validation-for="Input.Celular" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3">
                     <label class="form-label">Teléfono</label>
                     <input asp-for="Input.Telefono" class="form-control" maxlength="20" />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Cargo</label>
-                    <input asp-for="Input.Cargo" class="form-control" maxlength="150" />
+                    <label class="form-label">Cargo <span class="text-danger">*</span></label>
+                    <input asp-for="Input.Cargo" class="form-control" required maxlength="150" />
+                    <span asp-validation-for="Input.Cargo" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
+                    <label class="form-label">Empresa <span class="text-danger">*</span></label>
+                    <input asp-for="Input.Empresa" class="form-control" required maxlength="150" />
+                    <span asp-validation-for="Input.Empresa" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Rol</label>
+                    <input asp-for="Input.Rol" class="form-control" maxlength="100" />
+                </div>
+                <div class="col-md-4">
                     <label class="form-label">Tecnología</label>
                     <input asp-for="Input.Tecnologia" class="form-control" maxlength="100" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Capacidad</label>
+                    <input asp-for="Input.Capacidad" class="form-control" maxlength="50" />
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Seniority</label>
@@ -57,17 +84,43 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Fecha de ingreso</label>
-                    <input asp-for="Input.FechaIngreso" type="date" class="form-control" />
+                    <label class="form-label">Estado <span class="text-danger">*</span></label>
+                    <select asp-for="Input.Estado" class="form-select" required>
+                        <option value="Activo">Activo</option>
+                        <option value="Retirado">Retirado</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Fecha de nacimiento</label>
-                    <input asp-for="Input.FechaNacimiento" type="date" class="form-control" />
+                    <label class="form-label">Fecha de ingreso <span class="text-danger">*</span></label>
+                    <input asp-for="Input.FechaIngreso" type="date" class="form-control" required />
+                    <span asp-validation-for="Input.FechaIngreso" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Fecha de nacimiento <span class="text-danger">*</span></label>
+                    <input asp-for="Input.FechaNacimiento" type="date" class="form-control" required />
+                    <span asp-validation-for="Input.FechaNacimiento" class="text-danger small"></span>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Dirección</label>
+                    <input asp-for="Input.Direccion" class="form-control" maxlength="250" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Barrio</label>
+                    <input asp-for="Input.Barrio" class="form-control" maxlength="100" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Contacto de emergencia (nombre)</label>
+                    <input asp-for="Input.ContactoEmergenciaNombre" class="form-control" maxlength="150" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Contacto de emergencia (teléfono)</label>
+                    <input asp-for="Input.ContactoEmergenciaTelefono" class="form-control" maxlength="20" />
                 </div>
 
                 <div class="col-12">
                     <label class="form-label">
-                        Células <span class="text-muted small">(puede agregar una o varias)</span>
+                        Células <span class="text-danger">*</span>
+                        <span class="text-muted small">(puede agregar una o varias)</span>
                     </label>
                     @if (Model.CelulasDisponibles.Count == 0)
                     {
@@ -101,9 +154,9 @@
 
                 <div class="col-md-6">
                     <label class="form-label">
-                        Foto de perfil <span class="text-muted small">(opcional)</span>
+                        Foto de perfil <span class="text-danger">*</span>
                     </label>
-                    <input asp-for="Foto" type="file" class="form-control" accept="image/*" />
+                    <input asp-for="Foto" type="file" class="form-control" accept="image/*" required />
                     <span class="text-muted small">JPG, PNG, GIF o WEBP. Máximo 5 MB.</span>
                 </div>
             </div>

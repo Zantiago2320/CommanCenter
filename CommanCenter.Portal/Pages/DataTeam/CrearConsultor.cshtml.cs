@@ -6,7 +6,7 @@ using CommanCenter.Portal.Services;
 
 namespace CommanCenter.Portal.Pages.DataTeam;
 
-[Authorize]
+[Authorize(Roles = "Admin,Supervisor")]
 public class CrearConsultorModel : PageModel
 {
     private readonly IApiClient _api;
@@ -41,39 +41,48 @@ public class CrearConsultorModel : PageModel
     {
         await CargarCelulasAsync();
 
-        if (string.IsNullOrWhiteSpace(Input.Nombre) ||
-            string.IsNullOrWhiteSpace(Input.Apellido) ||
-            string.IsNullOrWhiteSpace(Input.Email))
+        if (!ModelState.IsValid)
         {
-            Error = "Nombre, apellido y email son obligatorios.";
+            Error = "Revise los campos obligatorios marcados.";
+            return Page();
+        }
+
+        if (Foto is not { Length: > 0 })
+        {
+            Error = "La foto de perfil es obligatoria.";
             return Page();
         }
 
         var token = HttpContext.Session.GetString("jwt_token");
 
-        // Subida de foto de perfil opcional
-        string? fotoUrl = null;
-        if (Foto is { Length: > 0 })
+        // Subida de foto de perfil (obligatoria)
+        var (fotoUrl, errorFoto) = await GuardarImagenAsync(Foto);
+        if (errorFoto is not null)
         {
-            var (ruta, error) = await GuardarImagenAsync(Foto);
-            if (error is not null)
-            {
-                Error = error;
-                return Page();
-            }
-            fotoUrl = ruta;
+            Error = errorFoto;
+            return Page();
         }
 
         // El cuerpo coincide con CrearConsultorDto de la API (incluye CelulasIds).
         var body = new
         {
+            Input.Cedula,
             Input.Nombre,
             Input.Apellido,
             Input.Email,
             Input.Telefono,
+            Input.Celular,
             Input.Cargo,
+            Input.Rol,
             Input.Tecnologia,
             Input.NivelSeniority,
+            Input.Capacidad,
+            Input.Empresa,
+            Input.Direccion,
+            Input.Barrio,
+            Input.ContactoEmergenciaNombre,
+            Input.ContactoEmergenciaTelefono,
+            Input.Estado,
             Input.FechaIngreso,
             Input.FechaNacimiento,
             Input.Observaciones,

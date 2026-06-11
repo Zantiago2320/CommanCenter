@@ -67,7 +67,7 @@
                 <i class="bi bi-people"></i>Consultores
             </a>
         </li>
-        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Lider"))
+        @if (User.IsInRole("Admin") || User.IsInRole("Supervisor") || User.IsInRole("Senior"))
         {
             <li class="nav-item">
                 <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/DataTeam/ConsultoresDeshabilitados") == true ? "active" : "")"
@@ -84,20 +84,29 @@
         </li>
     </ul>
 
-    @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+    @if (User.IsInRole("Admin") || User.IsInRole("Senior"))
     {
         <ul class="nav flex-column">
             <li class="nav-section">Administración</li>
+            @if (User.IsInRole("Admin"))
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/Usuarios") == true ? "active" : "")"
+                       asp-page="/Admin/Usuarios">
+                        <i class="bi bi-person-gear"></i>Usuarios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/Auditoria") == true ? "active" : "")"
+                       asp-page="/Admin/Auditoria">
+                        <i class="bi bi-clock-history"></i>Auditoría
+                    </a>
+                </li>
+            }
             <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/Usuarios") == true ? "active" : "")"
-                   asp-page="/Admin/Usuarios">
-                    <i class="bi bi-person-gear"></i>Usuarios
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/Auditoria") == true ? "active" : "")"
-                   asp-page="/Admin/Auditoria">
-                    <i class="bi bi-clock-history"></i>Auditoría
+                <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/Correos") == true ? "active" : "")"
+                   asp-page="/Admin/Correos">
+                    <i class="bi bi-envelope-paper"></i>Correos
                 </a>
             </li>
         </ul>
