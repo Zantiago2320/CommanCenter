@@ -1,0 +1,18 @@
+/* CommanCenter.Portal — site.css */
+/* Solo overrides; Bootstrap se carga desde CDN en el Layout */
+
+:root {
+    --cc-primary: #6366f1;
+    --cc-dark:    #0f172a;
+}
+
+/* Scrollbar custom */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+/* Tables */
+.table > :not(caption) > * > * { padding: .6rem .75rem; }
+
+/* Alerts compact */
+.alert { border-radius: 8px; }

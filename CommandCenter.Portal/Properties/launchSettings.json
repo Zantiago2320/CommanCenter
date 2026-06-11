@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "CommanCenter.Portal": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:62746;http://localhost:62747"
+    }
+  }
+}

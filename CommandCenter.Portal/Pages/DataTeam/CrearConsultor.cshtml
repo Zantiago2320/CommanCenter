@@ -1,0 +1,123 @@
+@page
+@model CommanCenter.Portal.Pages.DataTeam.CrearConsultorModel
+@{
+    ViewData["Title"] = "Nuevo Consultor";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Nuevo Consultor</h2>
+    <a asp-page="/DataTeam/Consultores" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Volver
+    </a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                    <input asp-for="Input.Nombre" class="form-control" required maxlength="100" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Apellido <span class="text-danger">*</span></label>
+                    <input asp-for="Input.Apellido" class="form-control" required maxlength="100" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input asp-for="Input.Email" type="email" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Teléfono</label>
+                    <input asp-for="Input.Telefono" class="form-control" maxlength="20" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Cargo</label>
+                    <input asp-for="Input.Cargo" class="form-control" maxlength="150" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tecnología</label>
+                    <input asp-for="Input.Tecnologia" class="form-control" maxlength="100" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Seniority</label>
+                    <select asp-for="Input.NivelSeniority" class="form-select">
+                        <option value="">— Seleccionar —</option>
+                        <option value="Trainee">Trainee</option>
+                        <option value="Junior">Junior</option>
+                        <option value="Semi Senior">Semi Senior</option>
+                        <option value="Senior">Senior</option>
+                        <option value="Lead">Lead</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Fecha de ingreso</label>
+                    <input asp-for="Input.FechaIngreso" type="date" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Fecha de nacimiento</label>
+                    <input asp-for="Input.FechaNacimiento" type="date" class="form-control" />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">
+                        Células <span class="text-muted small">(puede seleccionar una o varias)</span>
+                    </label>
+                    @if (Model.CelulasDisponibles.Count == 0)
+                    {
+                        <div class="alert alert-warning py-2 small mb-0">
+                            No hay células disponibles. Primero cree una célula.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row g-2">
+                            @foreach (var celula in Model.CelulasDisponibles)
+                            {
+                                <div class="col-md-4">
+                                    <div class="form-check border rounded p-2 ps-4 h-100">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="Input.CelulasIds" value="@celula.Id"
+                                               id="celula_@celula.Id" />
+                                        <label class="form-check-label d-flex align-items-center gap-2"
+                                               for="celula_@celula.Id">
+                                            <span class="rounded-circle d-inline-block"
+                                                  style="width:12px;height:12px;background:@celula.Color"></span>
+                                            @celula.Nombre
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Observaciones</label>
+                    <textarea asp-for="Input.Observaciones" class="form-control" rows="2"></textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Foto de perfil <span class="text-muted small">(opcional)</span>
+                    </label>
+                    <input asp-for="Foto" type="file" class="form-control" accept="image/*" />
+                    <span class="text-muted small">JPG, PNG, GIF o WEBP. Máximo 5 MB.</span>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>Crear Consultor
+                </button>
+                <a asp-page="/DataTeam/Consultores" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

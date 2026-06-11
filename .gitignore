@@ -1,0 +1,24 @@
+# Logs
+Logs/
+
+# Build
+bin/
+obj/
+
+# VS / Rider
+.vs/
+.idea/
+*.user
+*.suo
+
+# Secrets
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/secrets.json
+
+# NuGet
+.nuget/
+
+# OS
+.DS_Store
+Thumbs.db

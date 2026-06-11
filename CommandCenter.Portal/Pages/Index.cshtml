@@ -1,0 +1,44 @@
+@page
+@model CommanCenter.Portal.Pages.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@section Styles {
+    <style>
+        .stat-card { border-left: 4px solid; border-radius: 10px; }
+        .stat-card .stat-value { font-size: 2rem; font-weight: 700; }
+    </style>
+}
+
+<h2 class="fw-bold mb-4">Dashboard</h2>
+
+<div class="row g-3">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card border-primary h-100">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Módulos activos</p>
+                <div class="stat-value text-primary">1</div>
+                <p class="small text-muted mb-0">DataTeam</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card border-success h-100">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Estado API</p>
+                <div class="stat-value text-success"><i class="bi bi-check-circle-fill fs-2"></i></div>
+                <p class="small text-muted mb-0">Conectada</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-page="/DataTeam/Index" class="btn btn-outline-primary me-2">
+        <i class="bi bi-diagram-3 me-1"></i>Ver Organigrama
+    </a>
+    <a asp-page="/DataTeam/Consultores" class="btn btn-outline-secondary">
+        <i class="bi bi-people me-1"></i>Ver Consultores
+    </a>
+</div>

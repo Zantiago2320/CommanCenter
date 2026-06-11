@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — CommanCenter</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+    <style>
+        :root { --sidebar-width: 230px; --topbar-height: 56px; }
+
+        body { display: flex; background: #f8fafc; }
+
+        /* Sidebar */
+        #sidebar {
+            width: var(--sidebar-width); min-height: 100vh;
+            background: #0f172a; flex-shrink: 0; position: fixed;
+            top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100;
+        }
+        #sidebar .brand { padding: 1.2rem 1rem; border-bottom: 1px solid #1e293b; }
+        #sidebar .brand-text { font-weight: 700; font-size: 1rem; color: #f1f5f9; }
+        #sidebar .brand-sub  { font-size: .72rem; color: #475569; }
+        #sidebar .nav-link { color: #94a3b8; font-size: .875rem; border-radius: 8px; margin: 2px 8px; padding: .45rem .75rem; }
+        #sidebar .nav-link:hover, #sidebar .nav-link.active { background: #1e3a5f; color: #60a5fa; }
+        #sidebar .nav-link i { width: 20px; text-align: center; margin-right: 6px; }
+        #sidebar .nav-section { font-size: .68rem; color: #475569; text-transform: uppercase; letter-spacing: 1px; padding: .8rem 1rem .3rem; }
+
+        /* Main */
+        #main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); }
+        #topbar { height: var(--topbar-height); background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 1.5rem; gap: 1rem; position: sticky; top: 0; z-index: 99; }
+        #topbar .user-name { font-size: .875rem; font-weight: 600; }
+        .page-content { padding: 1.5rem; }
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav id="sidebar">
+    <div class="brand">
+        <div class="brand-text">⚡ CommanCenter</div>
+        <div class="brand-sub">Plataforma Empresarial</div>
+    </div>
+
+    <ul class="nav flex-column pt-2">
+        <li class="nav-section">General</li>
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")"
+               asp-page="/Index">
+                <i class="bi bi-house-door"></i>Dashboard
+            </a>
+        </li>
+
+        <li class="nav-section">DataTeam</li>
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/DataTeam/Index") == true ? "active" : "")"
+               asp-page="/DataTeam/Index">
+                <i class="bi bi-diagram-3"></i>Organigrama
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/DataTeam/Consultores" || ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/DataTeam/CrearConsultor") == true ? "active" : "")"
+               asp-page="/DataTeam/Consultores">
+                <i class="bi bi-people"></i>Consultores
+            </a>
+        </li>
+        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Lider"))
+        {
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/DataTeam/ConsultoresDeshabilitados") == true ? "active" : "")"
+                   asp-page="/DataTeam/ConsultoresDeshabilitados">
+                    <i class="bi bi-person-dash"></i>Deshabilitados
+                </a>
+            </li>
+        }
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/DataTeam/Celulas") == true || ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/DataTeam/GestionarCelula") == true ? "active" : "")"
+               asp-page="/DataTeam/Celulas">
+                <i class="bi bi-diagram-2"></i>Células
+            </a>
+        </li>
+    </ul>
+
+    @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+    {
+        <ul class="nav flex-column">
+            <li class="nav-section">Administración</li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/Usuarios") == true ? "active" : "")"
+                   asp-page="/Admin/Usuarios">
+                    <i class="bi bi-person-gear"></i>Usuarios
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Admin/Auditoria") == true ? "active" : "")"
+                   asp-page="/Admin/Auditoria">
+                    <i class="bi bi-clock-history"></i>Auditoría
+                </a>
+            </li>
+        </ul>
+    }
+</nav>
+
+<!-- Main -->
+<div id="main">
+    <!-- Topbar -->
+    <div id="topbar">
+        <div class="flex-grow-1"></div>
+        <span class="user-name text-muted">
+            <i class="bi bi-person-circle me-1"></i>@User.Identity?.Name
+        </span>
+        <a asp-page="/Auth/Logout" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-box-arrow-right me-1"></i>Salir
+        </a>
+    </div>
+
+    <!-- Page content -->
+    <div class="page-content">
+        @RenderBody()
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

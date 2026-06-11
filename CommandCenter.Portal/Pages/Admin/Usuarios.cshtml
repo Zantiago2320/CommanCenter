@@ -1,0 +1,130 @@
+@page
+@model CommanCenter.Portal.Pages.Admin.UsuariosModel
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Gestión de Usuarios</h4>
+        <small class="text-muted">El inicio de sesión es por nombre de usuario.</small>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Success))
+{
+    <div class="alert alert-success py-2">@Model.Success</div>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger py-2">@Model.Error</div>
+}
+
+<div class="row g-4">
+    <!-- Crear usuario -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-person-plus me-1"></i>Nuevo usuario
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="Crear">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de usuario</label>
+                        <input asp-for="Input.Usuario" class="form-control" placeholder="ej: carlos" />
+                        <span asp-validation-for="Input.Usuario" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input asp-for="Input.Password" type="password" class="form-control" placeholder="••••••••" />
+                        <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        <div class="form-text">Mínimo 8 caracteres, una mayúscula y un número.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select asp-for="Input.Rol" class="form-select">
+                            <option value="">— Seleccionar —</option>
+                            @foreach (var rol in Model.Roles)
+                            {
+                                <option value="@rol">@rol</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Input.Rol" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-lg me-1"></i>Crear usuario
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de usuarios -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-people me-1"></i>Usuarios registrados (@Model.Usuarios.Count)
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Rol</th>
+                            <th class="text-end pe-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Usuarios.Any())
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-4">No hay usuarios.</td></tr>
+                        }
+                        @foreach (var u in Model.Usuarios)
+                        {
+                            <tr>
+                                <td class="ps-3"><i class="bi bi-person-circle me-1 text-secondary"></i>@u.Usuario</td>
+                                <td>
+                                    @foreach (var r in u.Roles)
+                                    {
+                                        <span class="badge bg-info-subtle text-info-emphasis me-1">@r</span>
+                                    }
+                                </td>
+                                <td class="text-end pe-3">
+                                    <form method="post" asp-page-handler="CambiarRol" class="d-inline-flex align-items-center gap-1">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.Id" />
+                                        <select name="rol" class="form-select form-select-sm" style="width:auto">
+                                            @foreach (var rol in Model.Roles)
+                                            {
+                                                if (u.Roles.Contains(rol))
+                                                {
+                                                    <option value="@rol" selected>@rol</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@rol">@rol</option>
+                                                }
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary" title="Cambiar rol">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" asp-page-handler="Eliminar" class="d-inline"
+                                          onsubmit="return confirm('¿Eliminar al usuario @u.Usuario?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

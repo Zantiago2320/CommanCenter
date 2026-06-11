@@ -1,0 +1,120 @@
+@page
+@model CommanCenter.Portal.Pages.DataTeam.CelulasModel
+@{
+    ViewData["Title"] = "Células";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0">Células</h2>
+        <p class="text-muted small mb-0">@Model.Celulas.Count célula(s) registrada(s)</p>
+    </div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearCelula">
+        <i class="bi bi-plus-lg me-1"></i>Nueva Célula
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Success))
+{
+    <div class="alert alert-success py-2">@Model.Success</div>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger py-2">@Model.Error</div>
+}
+
+<div class="row g-3">
+    @if (!Model.Celulas.Any())
+    {
+        <div class="col-12">
+            <div class="alert alert-info">No hay células. Cree la primera con el botón "Nueva Célula".</div>
+        </div>
+    }
+    @foreach (var celula in Model.Celulas)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm" style="border-left:4px solid @celula.Color">
+                @if (!string.IsNullOrEmpty(celula.ImagenUrl))
+                {
+                    <img src="@celula.ImagenUrl" alt="@celula.Nombre" class="card-img-top"
+                         style="height:140px;object-fit:cover;" />
+                }
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0 fw-bold">
+                            <span class="rounded-circle d-inline-block me-1"
+                                  style="width:12px;height:12px;background:@celula.Color"></span>
+                            @celula.Nombre
+                        </h5>
+                        <span class="badge text-white" style="background:@celula.Color">
+                            @celula.TotalMiembros miembro(s)
+                        </span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(celula.NombreLider))
+                    {
+                        <p class="small mb-1">
+                            <i class="bi bi-person-badge me-1 text-warning"></i>Líder: <strong>@celula.NombreLider</strong>
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="small text-muted mb-1"><i class="bi bi-person-badge me-1"></i>Sin líder asignado</p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(celula.Descripcion))
+                    {
+                        <p class="small text-muted mb-0">@celula.Descripcion</p>
+                    }
+                </div>
+                <div class="card-footer bg-white border-0">
+                    <a asp-page="/DataTeam/GestionarCelula" asp-route-id="@celula.Id"
+                       class="btn btn-sm btn-outline-primary w-100">
+                        <i class="bi bi-gear me-1"></i>Gestionar miembros y líder
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal: Crear Célula -->
+<div class="modal fade" id="modalCrearCelula" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Crear" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Nueva Célula</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                        <input asp-for="Input.Nombre" class="form-control" maxlength="100" required />
+                        <span asp-validation-for="Input.Nombre" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea asp-for="Input.Descripcion" class="form-control" rows="2" maxlength="500"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Color</label>
+                        <input asp-for="Input.Color" type="color" class="form-control form-control-color" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Foto de la célula <span class="text-muted small">(opcional)</span></label>
+                        <input asp-for="Imagen" type="file" class="form-control" accept="image/*" />
+                        <span class="text-muted small">JPG, PNG, GIF o WEBP. Máximo 5 MB. Es opcional.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>Crear Célula
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

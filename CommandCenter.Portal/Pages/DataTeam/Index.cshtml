@@ -1,0 +1,82 @@
+@page
+@model CommanCenter.Portal.Pages.DataTeam.IndexModel
+@{
+    ViewData["Title"] = "DataTeam — Organigrama";
+}
+
+@section Styles {
+    <style>
+        .celula-card {
+            border-left: 4px solid var(--celula-color, #28a745);
+            transition: transform .15s, box-shadow .15s;
+        }
+        .celula-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+        .badge-miembros { font-size: .75rem; }
+    </style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0">Organigrama DataTeam</h2>
+        <p class="text-muted small mb-0">@Model.Celulas.Count células · @Model.TotalConsultores consultores</p>
+    </div>
+    <a asp-page="/DataTeam/Consultores" class="btn btn-primary btn-sm">
+        <i class="bi bi-people-fill me-1"></i>Consultores
+    </a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+<div class="row g-3">
+    @foreach (var celula in Model.Celulas)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card celula-card h-100" style="--celula-color: @celula.Color">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0 fw-bold">@celula.Nombre</h5>
+                        <span class="badge badge-miembros text-white"
+                              style="background:@celula.Color">
+                            @celula.TotalMiembros miembro(s)
+                        </span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(celula.NombreLider))
+                    {
+                        <p class="small text-muted mb-2">
+                            <i class="bi bi-person-badge me-1"></i>Líder: <strong>@celula.NombreLider</strong>
+                        </p>
+                    }
+                    @if (!string.IsNullOrEmpty(celula.Descripcion))
+                    {
+                        <p class="small text-muted mb-0">@celula.Descripcion</p>
+                    }
+
+                    @if (celula.Miembros.Count > 0)
+                    {
+                        <hr class="my-2" />
+                        <ul class="list-unstyled mb-0 small">
+                            @foreach (var m in celula.Miembros.Take(5))
+                            {
+                                <li class="d-flex align-items-center gap-2 py-1">
+                                    <span class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold"
+                                          style="width:28px;height:28px;font-size:.7rem;background:@celula.Color">
+                                        @m.NombreCompleto[0]
+                                    </span>
+                                    @m.NombreCompleto
+                                    @if (m.EsLider) { <span class="badge bg-warning text-dark ms-auto">Líder</span> }
+                                </li>
+                            }
+                            @if (celula.Miembros.Count > 5)
+                            {
+                                <li class="text-muted">+ @(celula.Miembros.Count - 5) más...</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
