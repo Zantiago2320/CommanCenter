@@ -44,6 +44,18 @@ public class ConsultoresController : ControllerBase
     public async Task<IActionResult> GetByCelula(int celulaId) =>
         Ok(await _service.GetByCelulaAsync(celulaId));
 
+    /// <summary>Exporta el directorio de consultores activos a un archivo Excel (.xlsx).</summary>
+    [HttpGet("export/excel")]
+    [Authorize(Roles = "Admin,Supervisor,Senior")]
+    public async Task<IActionResult> ExportarExcel()
+    {
+        var contenido = await _service.ExportarExcelAsync();
+        var nombre = $"consultores_{DateTime.UtcNow:yyyyMMdd_HHmm}.xlsx";
+        return File(contenido,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            nombre);
+    }
+
     /// <summary>Crea un nuevo consultor.</summary>
     [HttpPost]
     [Authorize(Roles = "Admin,Supervisor")]

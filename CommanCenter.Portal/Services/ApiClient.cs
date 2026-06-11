@@ -12,6 +12,9 @@ public interface IApiClient
     Task<ApiResponse<T>?> PutAsync<T>(string endpoint, object body, string? token = null);
     Task<ApiResponse<T>?> PatchAsync<T>(string endpoint, object body, string? token = null);
     Task<ApiResponse<T>?> DeleteAsync<T>(string endpoint, string? token = null);
+
+    /// <summary>Descarga un archivo binario (p. ej. Excel) desde la API.</summary>
+    Task<(byte[] contenido, string contentType, string nombreArchivo)?> DownloadAsync(string endpoint, string? token = null);
 }
 
 public class ApiClient : IApiClient
@@ -113,6 +116,29 @@ public class ApiClient : IApiClient
         if (!string.IsNullOrWhiteSpace(token))
             _http.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
+    }
+
+    public async Task<(byte[] contenido, string contentType, string nombreArchivo)?> DownloadAsync(string endpoint, string? token = null)
+    {
+        SetBearer(token);
+        try
+        {
+            var response = await _http.GetAsync(endpoint);
+            if (!response.IsSuccessStatusCode) return null;
+
+            var bytes = await response.Content.ReadAsByteArrayAsync();
+            var contentType = response.Content.Headers.ContentType?.MediaType
+                ?? "application/octet-stream";
+            var nombre = response.Content.Headers.ContentDisposition?.FileNameStar
+                ?? response.Content.Headers.ContentDisposition?.FileName?.Trim('"')
+                ?? "archivo";
+            return (bytes, contentType, nombre);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "DOWNLOAD {Endpoint} failed", endpoint);
+            return null;
+        }
     }
 
     private static async Task<ApiResponse<T>?> ParseAsync<T>(HttpResponseMessage response)

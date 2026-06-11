@@ -123,9 +123,9 @@ static async Task SeedAsync(RoleManager<IdentityRole> roleManager, UserManager<I
     }
 
     // Usuarios iniciales: se inicia sesión con el NOMBRE de usuario (no con correo).
-    await CrearUsuarioAsync(userManager, "alexander", "Alexander@123", "Admin");
-    await CrearUsuarioAsync(userManager, "sergio", "Sergio@123", "Admin");
-    await CrearUsuarioAsync(userManager, "supervisor", "Supervisor@123", "Supervisor");
+    await CrearUsuarioAsync(userManager, "admin", "Admin@123", "Admin");
+    await CrearUsuarioAsync(userManager, "alexander", "Alexander@123", "Supervisor");
+    await CrearUsuarioAsync(userManager, "sergio", "Sergio@123", "Supervisor");
     await CrearUsuarioAsync(userManager, "senior", "Senior@123", "Senior");
 }
 

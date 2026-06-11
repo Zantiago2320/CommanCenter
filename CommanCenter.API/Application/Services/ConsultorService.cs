@@ -11,15 +11,18 @@ public class ConsultorService : IConsultorService
 {
     private readonly IConsultorRepository _repo;
     private readonly IAuditoriaRepository _auditoria;
+    private readonly IExcelExportService _excel;
     private readonly ILogger<ConsultorService> _logger;
 
     public ConsultorService(
         IConsultorRepository repo,
         IAuditoriaRepository auditoria,
+        IExcelExportService excel,
         ILogger<ConsultorService> logger)
     {
         _repo = repo;
         _auditoria = auditoria;
+        _excel = excel;
         _logger = logger;
     }
 
@@ -36,6 +39,12 @@ public class ConsultorService : IConsultorService
             _logger.LogError(ex, "Error al obtener consultores");
             return ApiResponse<IEnumerable<ConsultorDto>>.Fail("Error interno al obtener consultores.");
         }
+    }
+
+    public async Task<byte[]> ExportarExcelAsync()
+    {
+        var consultores = await _repo.GetHabilitadosAsync();
+        return _excel.GenerarDirectorio(consultores);
     }
 
     public async Task<ApiResponse<IEnumerable<ConsultorDto>>> GetDeshabilitadosAsync()

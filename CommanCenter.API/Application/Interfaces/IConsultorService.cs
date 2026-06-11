@@ -14,4 +14,7 @@ public interface IConsultorService
     Task<ApiResponse<bool>> RehabilitarAsync(int id, string usuarioId);
     Task<ApiResponse<bool>> EliminarAsync(int id, string usuarioId);
     Task<ApiResponse<IEnumerable<ConsultorDto>>> GetByCelulaAsync(int celulaId);
+
+    /// <summary>Genera el directorio de consultores activos en formato Excel (.xlsx).</summary>
+    Task<byte[]> ExportarExcelAsync();
 }

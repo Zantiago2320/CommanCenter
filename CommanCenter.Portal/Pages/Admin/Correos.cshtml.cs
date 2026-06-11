@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using CommanCenter.Portal.Models;
 using CommanCenter.Portal.Services;
 
 namespace CommanCenter.Portal.Pages.Admin;
@@ -20,7 +21,15 @@ public class CorreosModel : PageModel
     public string? Error { get; set; }
     public string? Success { get; set; }
 
-    public void OnGet() { }
+    public PreviewCorreoViewModel? Cumpleanios { get; set; }
+    public PreviewCorreoViewModel? Reporte { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        if (TempData["Success"] is string ok) Success = ok;
+        if (TempData["Error"] is string err) Error = err;
+        await CargarPreviewsAsync();
+    }
 
     public async Task<IActionResult> OnPostCumpleaniosAsync()
     {
@@ -30,14 +39,14 @@ public class CorreosModel : PageModel
         if (result?.Exitoso == true)
         {
             _logger.LogInformation("Recordatorio de cumpleaños del mes enviado manualmente.");
-            Success = result.Mensaje ?? "Recordatorio de cumpleaños enviado correctamente.";
+            TempData["Success"] = result.Mensaje ?? "Recordatorio de cumpleaños enviado correctamente.";
         }
         else
         {
-            Error = result?.Mensaje ?? "No se pudo enviar el recordatorio de cumpleaños.";
+            TempData["Error"] = result?.Mensaje ?? "No se pudo enviar el recordatorio de cumpleaños.";
         }
 
-        return Page();
+        return RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostReporteAsync()
@@ -48,13 +57,26 @@ public class CorreosModel : PageModel
         if (result?.Exitoso == true)
         {
             _logger.LogInformation("Reporte mensual enviado manualmente.");
-            Success = result.Mensaje ?? "Reporte mensual enviado correctamente.";
+            TempData["Success"] = result.Mensaje ?? "Reporte mensual enviado correctamente.";
         }
         else
         {
-            Error = result?.Mensaje ?? "No se pudo enviar el reporte mensual.";
+            TempData["Error"] = result?.Mensaje ?? "No se pudo enviar el reporte mensual.";
         }
 
-        return Page();
+        return RedirectToPage();
+    }
+
+    private async Task CargarPreviewsAsync()
+    {
+        var token = HttpContext.Session.GetString("jwt_token");
+
+        var cumple = await _api.GetAsync<PreviewCorreoViewModel>("api/notifications/cumpleanios-mes/preview", token);
+        if (cumple?.Exitoso == true && cumple.Data is not null)
+            Cumpleanios = cumple.Data;
+
+        var reporte = await _api.GetAsync<PreviewCorreoViewModel>("api/notifications/reporte-mensual/preview", token);
+        if (reporte?.Exitoso == true && reporte.Data is not null)
+            Reporte = reporte.Data;
     }
 }

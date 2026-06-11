@@ -152,6 +152,7 @@ public static class ServiceCollectionExtensions
 
         // Infrastructure Services
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IExcelExportService, ExcelExportService>();
 
         // Jobs (Hangfire)
         services.AddScoped<NotificationJobs>();

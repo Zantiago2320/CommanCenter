@@ -35,6 +35,9 @@
 	<!-- Azure Communication Services - Email -->
 	<PackageReference Include="Azure.Communication.Email" Version="1.0.1" />
 
+	<!-- Exportación a Excel -->
+	<PackageReference Include="ClosedXML" Version="0.104.2" />
+
 	<!-- Application Insights -->
 	<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
 

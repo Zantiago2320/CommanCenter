@@ -19,6 +19,9 @@
     <h2 class="fw-bold mb-0">Consultores</h2>
     <div class="d-flex align-items-center gap-2">
         <span class="badge bg-primary fs-6">@Model.Consultores.Count registros</span>
+        <a asp-page-handler="ExportarExcel" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-file-earmark-excel me-1"></i>Exportar a Excel
+        </a>
         <a asp-page="/DataTeam/ConsultoresDeshabilitados" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-person-dash me-1"></i>Ver deshabilitados
         </a>

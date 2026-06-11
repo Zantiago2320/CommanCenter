@@ -22,20 +22,100 @@ public class NotificationsController : ControllerBase
 {
     private readonly INotificationService _notification;
     private readonly NotificationJobs _jobs;
+    private readonly IConsultorRepository _consultorRepo;
     private readonly AppDbContext _db;
     private readonly ILogger<NotificationsController> _logger;
 
     public NotificationsController(
         INotificationService notification,
         NotificationJobs jobs,
+        IConsultorRepository consultorRepo,
         AppDbContext db,
         ILogger<NotificationsController> logger)
     {
         _notification = notification;
         _jobs = jobs;
+        _consultorRepo = consultorRepo;
         _db = db;
         _logger = logger;
     }
+
+    /// <summary>
+    /// Vista previa del correo de cumpleaños del mes: muestra a quiénes se
+    /// enviará, los destinatarios configurados y los datos que irán en el Excel adjunto.
+    /// </summary>
+    [HttpGet("cumpleanios-mes/preview")]
+    [Authorize(Roles = "Admin,Senior")]
+    public async Task<IActionResult> PreviewCumpleaniosDelMes()
+    {
+        var nombreMes = DateTime.UtcNow.ToString("MMMM");
+        var cumpleanieros = (await _consultorRepo.GetCumpleaniosDelMesAsync(DateTime.UtcNow.Month)).ToList();
+
+        var preview = new PreviewCorreoDto
+        {
+            Titulo = $"Cumpleaños del mes — {nombreMes}",
+            Periodo = nombreMes,
+            Destinatarios = ObtenerDestinatarios("Notificaciones:RecordatorioCumpleaniosDestinatarios"),
+            Total = cumpleanieros.Count,
+            Adjunto = $"cumpleanios_{nombreMes}.xlsx",
+            Items = cumpleanieros.Select(c => new PreviewItemDto
+            {
+                Detalle = c.FechaNacimiento.HasValue ? $"{c.FechaNacimiento.Value.Day} de {nombreMes}" : "—",
+                Nombre = c.Nombre,
+                Apellido = c.Apellido,
+                Cargo = c.Cargo ?? "—",
+                Celula = ObtenerCelulas(c),
+                Email = c.Email
+            }).ToList()
+        };
+
+        return Ok(ApiResponse<PreviewCorreoDto>.Ok(preview));
+    }
+
+    /// <summary>
+    /// Vista previa del reporte mensual: trabajadores activos, destinatarios
+    /// configurados y datos que irán en el Excel adjunto.
+    /// </summary>
+    [HttpGet("reporte-mensual/preview")]
+    [Authorize(Roles = "Admin,Senior")]
+    public async Task<IActionResult> PreviewReporteMensual()
+    {
+        var periodo = DateTime.UtcNow.ToString("MMMM yyyy");
+        var habilitados = (await _consultorRepo.GetHabilitadosAsync()).ToList();
+
+        var preview = new PreviewCorreoDto
+        {
+            Titulo = $"Trabajadores actuales — {periodo}",
+            Periodo = periodo,
+            Destinatarios = ObtenerDestinatarios("Notificaciones:ReporteMensualDestinatarios"),
+            Total = habilitados.Count,
+            Adjunto = "reporte_mensual.xlsx",
+            Items = habilitados.Select(c => new PreviewItemDto
+            {
+                Detalle = c.Estado,
+                Nombre = c.Nombre,
+                Apellido = c.Apellido,
+                Cargo = c.Cargo ?? "—",
+                Celula = ObtenerCelulas(c),
+                Email = c.Email
+            }).ToList()
+        };
+
+        return Ok(ApiResponse<PreviewCorreoDto>.Ok(preview));
+    }
+
+    private List<string> ObtenerDestinatarios(string clave)
+    {
+        var config = HttpContext.RequestServices.GetService(typeof(IConfiguration)) as IConfiguration;
+        return (config?.GetSection(clave).Get<string[]>() ?? Array.Empty<string>())
+            .Where(d => !string.IsNullOrWhiteSpace(d))
+            .ToList();
+    }
+
+    private static string ObtenerCelulas(Domain.Entities.Consultor c) =>
+        c.Celulas != null && c.Celulas.Count > 0
+            ? string.Join(", ", c.Celulas.Select(cm => cm.Celula?.Nombre).Where(n => !string.IsNullOrWhiteSpace(n)))
+            : "—";
 
     /// <summary>
     /// Envía un correo a uno o varios destinatarios.
@@ -202,4 +282,25 @@ public class NotificacionDto
     public bool Enviado { get; set; }
     public DateTime FechaCreacion { get; set; }
     public DateTime? FechaEnvio { get; set; }
+}
+
+/// <summary>Vista previa de un correo automatizado (cumpleaños o reporte mensual).</summary>
+public class PreviewCorreoDto
+{
+    public string Titulo { get; set; } = string.Empty;
+    public string Periodo { get; set; } = string.Empty;
+    public List<string> Destinatarios { get; set; } = new();
+    public int Total { get; set; }
+    public string Adjunto { get; set; } = string.Empty;
+    public List<PreviewItemDto> Items { get; set; } = new();
+}
+
+public class PreviewItemDto
+{
+    public string Detalle { get; set; } = string.Empty;
+    public string Nombre { get; set; } = string.Empty;
+    public string Apellido { get; set; } = string.Empty;
+    public string Cargo { get; set; } = string.Empty;
+    public string Celula { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 }

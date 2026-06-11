@@ -15,17 +15,20 @@ public class NotificationJobs
 {
     private readonly IConsultorRepository _consultorRepo;
     private readonly INotificationService _notificacion;
+    private readonly IExcelExportService _excel;
     private readonly IConfiguration _config;
     private readonly ILogger<NotificationJobs> _logger;
 
     public NotificationJobs(
         IConsultorRepository consultorRepo,
         INotificationService notificacion,
+        IExcelExportService excel,
         IConfiguration config,
         ILogger<NotificationJobs> logger)
     {
         _consultorRepo = consultorRepo;
         _notificacion = notificacion;
+        _excel = excel;
         _config = config;
         _logger = logger;
     }
@@ -86,8 +89,19 @@ public class NotificationJobs
         var asunto = $"🎂 Cumpleaños del mes — {nombreMes}";
         var cuerpo = sb.ToString();
 
-        foreach (var dest in destinatarios)
-            await _notificacion.EnviarEmailAsync(dest, asunto, cuerpo);
+        // Adjunta el Excel con el listado de cumpleaños del mes.
+        if (cumpleanieros.Count > 0)
+        {
+            var excel = _excel.GenerarCumpleaniosDelMes(cumpleanieros, nombreMes);
+            var nombreArchivo = $"cumpleanios_{nombreMes}_{DateTime.UtcNow:yyyyMMdd}.xlsx";
+            foreach (var dest in destinatarios)
+                await _notificacion.EnviarEmailConAdjuntoAsync(dest, asunto, cuerpo, excel, nombreArchivo);
+        }
+        else
+        {
+            foreach (var dest in destinatarios)
+                await _notificacion.EnviarEmailAsync(dest, asunto, cuerpo);
+        }
 
         _logger.LogInformation("Job recordatorio cumpleaños: {Cantidad} cumpleañeros en {Mes}, enviado a {Destinatarios} destinatarios.",
             cumpleanieros.Count, nombreMes, destinatarios.Length);
@@ -142,8 +156,19 @@ public class NotificationJobs
         var asunto = $"📊 Trabajadores actuales — {periodo}";
         var cuerpo = sb.ToString();
 
-        foreach (var dest in destinatarios)
-            await _notificacion.EnviarEmailAsync(dest, asunto, cuerpo);
+        // Adjunta el Excel con el reporte de trabajadores activos.
+        if (habilitados.Count > 0)
+        {
+            var excel = _excel.GenerarReporteMensual(habilitados, periodo);
+            var nombreArchivo = $"reporte_mensual_{DateTime.UtcNow:yyyyMMdd}.xlsx";
+            foreach (var dest in destinatarios)
+                await _notificacion.EnviarEmailConAdjuntoAsync(dest, asunto, cuerpo, excel, nombreArchivo);
+        }
+        else
+        {
+            foreach (var dest in destinatarios)
+                await _notificacion.EnviarEmailAsync(dest, asunto, cuerpo);
+        }
 
         _logger.LogInformation("Job reporte mensual: {Cantidad} trabajadores, enviado a {Destinatarios} destinatarios.",
             habilitados.Count, destinatarios.Length);

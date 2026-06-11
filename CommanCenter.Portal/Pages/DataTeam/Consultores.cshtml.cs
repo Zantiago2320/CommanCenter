@@ -60,6 +60,21 @@ public class ConsultoresModel : PageModel
         return RedirectToPage();
     }
 
+    public async Task<IActionResult> OnGetExportarExcelAsync()
+    {
+        var token = HttpContext.Session.GetString("jwt_token");
+        var archivo = await _api.DownloadAsync("api/consultores/export/excel", token);
+
+        if (archivo is null)
+        {
+            TempData["Error"] = "No se pudo generar el archivo Excel.";
+            return RedirectToPage();
+        }
+
+        var (contenido, contentType, nombre) = archivo.Value;
+        return File(contenido, contentType, nombre);
+    }
+
     private async Task CargarAsync()
     {
         if (TempData["Error"] is string err) Error = err;

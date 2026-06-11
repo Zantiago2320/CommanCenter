@@ -198,6 +198,27 @@ public class CrearCelulaInput
     public string Color { get; set; } = "#28a745";
 }
 
+/// <summary>Vista previa de un correo automatizado (cumpleaños o reporte mensual).</summary>
+public class PreviewCorreoViewModel
+{
+    public string Titulo { get; set; } = string.Empty;
+    public string Periodo { get; set; } = string.Empty;
+    public List<string> Destinatarios { get; set; } = [];
+    public int Total { get; set; }
+    public string Adjunto { get; set; } = string.Empty;
+    public List<PreviewItemViewModel> Items { get; set; } = [];
+}
+
+public class PreviewItemViewModel
+{
+    public string Detalle { get; set; } = string.Empty;
+    public string Nombre { get; set; } = string.Empty;
+    public string Apellido { get; set; } = string.Empty;
+    public string Cargo { get; set; } = string.Empty;
+    public string Celula { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+}
+
 /// <summary>Registro de auditoría: quién hizo qué y cuándo.</summary>
 public class AuditoriaLogViewModel
 {
