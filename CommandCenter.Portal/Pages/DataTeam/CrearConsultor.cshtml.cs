@@ -10,7 +10,7 @@ namespace CommanCenter.Portal.Pages.DataTeam;
 public class CrearConsultorModel : PageModel
 {
     private readonly IApiClient _api;
-    private readonly IWebHostEnvironment _env;
+    private readonly IImageStorageService _imagenes;
     private readonly ILogger<CrearConsultorModel> _logger;
 
     private static readonly string[] ExtensionesPermitidas = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
@@ -25,10 +25,10 @@ public class CrearConsultorModel : PageModel
     public string? Error { get; set; }
     public string? Success { get; set; }
 
-    public CrearConsultorModel(IApiClient api, IWebHostEnvironment env, ILogger<CrearConsultorModel> logger)
+    public CrearConsultorModel(IApiClient api, IImageStorageService imagenes, ILogger<CrearConsultorModel> logger)
     {
         _api = api;
-        _env = env;
+        _imagenes = imagenes;
         _logger = logger;
     }
 
@@ -95,7 +95,7 @@ public class CrearConsultorModel : PageModel
     }
 
     /// <summary>
-    /// Guarda la imagen en wwwroot/uploads/consultores y devuelve la ruta pública relativa.
+    /// Sube la imagen (Blob Storage o local) y devuelve la URL pública.
     /// </summary>
     private async Task<(string? ruta, string? error)> GuardarImagenAsync(IFormFile imagen)
     {
@@ -106,18 +106,10 @@ public class CrearConsultorModel : PageModel
         if (imagen.Length > TamanoMaximoBytes)
             return (null, "La imagen supera el tamaño máximo de 5 MB.");
 
-        var carpeta = Path.Combine(_env.WebRootPath, "uploads", "consultores");
-        Directory.CreateDirectory(carpeta);
-
         var nombreArchivo = $"consultor_{Guid.NewGuid():N}{extension}";
-        var rutaFisica = Path.Combine(carpeta, nombreArchivo);
-
-        await using (var stream = new FileStream(rutaFisica, FileMode.Create))
-        {
-            await imagen.CopyToAsync(stream);
-        }
-
-        return ($"/uploads/consultores/{nombreArchivo}", null);
+        await using var stream = imagen.OpenReadStream();
+        var url = await _imagenes.SubirAsync(stream, nombreArchivo, "consultores", imagen.ContentType);
+        return (url, null);
     }
 
     private async Task CargarCelulasAsync()

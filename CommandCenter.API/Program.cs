@@ -91,6 +91,20 @@ app.UseHangfireDashboard(
     builder.Configuration["Hangfire:DashboardPath"] ?? "/jobs",
     new DashboardOptions { Authorization = new[] { new HangfireAuthFilter() } });
 
+// ── Jobs recurrentes (correos automáticos) ──────────────────────────────────
+// CRON: "min hora día-del-mes mes día-de-la-semana" (hora del servidor, UTC).
+// Recordatorio de cumpleaños del mes: el día 1 de cada mes a las 08:00.
+RecurringJob.AddOrUpdate<CommandCenter.API.Infrastructure.Jobs.NotificationJobs>(
+    "recordatorio-cumpleanios-mes",
+    job => job.EnviarRecordatorioCumpleaniosDelMesAsync(),
+    "0 8 1 * *");
+
+// Reporte mensual del equipo: el día 1 de cada mes a las 08:30.
+RecurringJob.AddOrUpdate<CommandCenter.API.Infrastructure.Jobs.NotificationJobs>(
+    "reporte-mensual",
+    job => job.EnviarReporteMensualAsync(),
+    "30 8 1 * *");
+
 app.MapControllers();
 
 Log.Information("🚀 Command Center API iniciada en {Environment}", app.Environment.EnvironmentName);

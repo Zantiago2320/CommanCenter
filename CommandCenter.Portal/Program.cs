@@ -63,6 +63,7 @@ builder.Services.AddAuthorization();
 
 // ── Application Services ───────────────────────────────────────────────────
 builder.Services.AddScoped<IAuthPortalService, AuthPortalService>();
+builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 
 // ── Notification API ───────────────────────────────────────────────────────
 var notifBase    = builder.Configuration["NotificationApi:BaseUrl"] ?? "";

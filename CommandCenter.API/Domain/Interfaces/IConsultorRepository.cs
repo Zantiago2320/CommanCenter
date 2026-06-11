@@ -9,4 +9,5 @@ public interface IConsultorRepository : IRepository<Consultor>
     Task<IEnumerable<Consultor>> GetByCelulaAsync(int celulaId);
     Task<Consultor?> GetByEmailAsync(string email);
     Task<IEnumerable<Consultor>> GetCumpleaniosHoyAsync();
+    Task<IEnumerable<Consultor>> GetCumpleaniosDelMesAsync(int mes);
 }

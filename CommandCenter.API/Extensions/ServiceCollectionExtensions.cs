@@ -2,6 +2,7 @@ using CommandCenter.API.Application.Interfaces;
 using CommandCenter.API.Application.Services;
 using CommandCenter.API.Domain.Interfaces;
 using CommandCenter.API.Infrastructure.Data;
+using CommandCenter.API.Infrastructure.Jobs;
 using CommandCenter.API.Infrastructure.Repositories;
 using CommandCenter.API.Infrastructure.Services;
 using Hangfire;
@@ -147,9 +148,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IConsultorService, ConsultorService>();
         services.AddScoped<ICelulaService, CelulaService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuditoriaService, AuditoriaService>();
 
         // Infrastructure Services
         services.AddScoped<INotificationService, NotificationService>();
+
+        // Jobs (Hangfire)
+        services.AddScoped<NotificationJobs>();
 
         return services;
     }

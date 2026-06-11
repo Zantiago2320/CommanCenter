@@ -47,4 +47,13 @@ public class ConsultorRepository : Repository<Consultor>, IConsultorRepository
                      && c.Habilitado && c.Activo)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Consultor>> GetCumpleaniosDelMesAsync(int mes) =>
+        await _context.Consultores
+            .Include(c => c.Celulas).ThenInclude(cm => cm.Celula)
+            .Where(c => c.FechaNacimiento.HasValue
+                     && c.FechaNacimiento.Value.Month == mes
+                     && c.Habilitado && c.Activo)
+            .OrderBy(c => c.FechaNacimiento!.Value.Day)
+            .ToListAsync();
 }

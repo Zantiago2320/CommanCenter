@@ -1,5 +1,4 @@
-using CommandCenter.API.Application.DTOs.Common;
-using CommandCenter.API.Domain.Interfaces;
+using CommandCenter.API.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,65 +14,30 @@ namespace CommandCenter.API.Controllers;
 [Produces("application/json")]
 public class AuditoriaController : ControllerBase
 {
-    private readonly IAuditoriaRepository _repo;
+    private readonly IAuditoriaService _service;
 
-    public AuditoriaController(IAuditoriaRepository repo)
+    public AuditoriaController(IAuditoriaService service)
     {
-        _repo = repo;
+        _service = service;
     }
 
     /// <summary>Obtiene los registros de auditoría más recientes.</summary>
     [HttpGet]
-    public async Task<IActionResult> GetRecientes([FromQuery] int top = 100)
-    {
-        if (top is < 1 or > 500) top = 100;
-        var logs = await _repo.GetRecientesAsync(top);
-        return Ok(ApiResponse<IEnumerable<AuditoriaLogDto>>.Ok(logs.Select(MapToDto)));
-    }
+    public async Task<IActionResult> GetRecientes([FromQuery] int top = 100) =>
+        Ok(await _service.GetRecientesAsync(top));
 
     /// <summary>Obtiene la auditoría de un usuario concreto.</summary>
     [HttpGet("usuario/{usuario}")]
-    public async Task<IActionResult> GetByUsuario(string usuario)
-    {
-        var logs = await _repo.GetByUsuarioAsync(usuario);
-        return Ok(ApiResponse<IEnumerable<AuditoriaLogDto>>.Ok(logs.Select(MapToDto)));
-    }
+    public async Task<IActionResult> GetByUsuario(string usuario) =>
+        Ok(await _service.GetByUsuarioAsync(usuario));
 
     /// <summary>Obtiene la auditoría de un módulo (ej. DataTeam, Auth).</summary>
     [HttpGet("modulo/{modulo}")]
-    public async Task<IActionResult> GetByModulo(string modulo)
-    {
-        var logs = await _repo.GetByModuloAsync(modulo);
-        return Ok(ApiResponse<IEnumerable<AuditoriaLogDto>>.Ok(logs.Select(MapToDto)));
-    }
+    public async Task<IActionResult> GetByModulo(string modulo) =>
+        Ok(await _service.GetByModuloAsync(modulo));
 
-    private static AuditoriaLogDto MapToDto(Domain.Entities.AuditoriaLog a) => new()
-    {
-        Id = a.Id,
-        Fecha = a.FechaCreacion,
-        Usuario = a.UsuarioId,
-        Modulo = a.Modulo,
-        Accion = a.Accion,
-        Entidad = a.Entidad,
-        EntidadId = a.EntidadId,
-        ValorAnterior = a.ValorAnterior,
-        ValorNuevo = a.ValorNuevo,
-        Exitoso = a.Exitoso,
-        Error = a.MensajeError
-    };
-}
-
-public class AuditoriaLogDto
-{
-    public int Id { get; set; }
-    public DateTime Fecha { get; set; }
-    public string? Usuario { get; set; }
-    public string Modulo { get; set; } = string.Empty;
-    public string Accion { get; set; } = string.Empty;
-    public string Entidad { get; set; } = string.Empty;
-    public string? EntidadId { get; set; }
-    public string? ValorAnterior { get; set; }
-    public string? ValorNuevo { get; set; }
-    public bool Exitoso { get; set; }
-    public string? Error { get; set; }
+    /// <summary>Obtiene la auditoría dentro de un rango de fechas.</summary>
+    [HttpGet("fecha")]
+    public async Task<IActionResult> GetByFecha([FromQuery] DateTime desde, [FromQuery] DateTime hasta) =>
+        Ok(await _service.GetByFechaAsync(desde, hasta));
 }

@@ -10,7 +10,7 @@ namespace CommanCenter.Portal.Pages.DataTeam;
 public class CelulasModel : PageModel
 {
     private readonly IApiClient _api;
-    private readonly IWebHostEnvironment _env;
+    private readonly IImageStorageService _imagenes;
     private readonly ILogger<CelulasModel> _logger;
 
     private static readonly string[] ExtensionesPermitidas = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
@@ -23,10 +23,10 @@ public class CelulasModel : PageModel
     [BindProperty] public CrearCelulaInput Input { get; set; } = new();
     [BindProperty] public IFormFile? Imagen { get; set; }
 
-    public CelulasModel(IApiClient api, IWebHostEnvironment env, ILogger<CelulasModel> logger)
+    public CelulasModel(IApiClient api, IImageStorageService imagenes, ILogger<CelulasModel> logger)
     {
         _api = api;
-        _env = env;
+        _imagenes = imagenes;
         _logger = logger;
     }
 
@@ -78,7 +78,7 @@ public class CelulasModel : PageModel
     }
 
     /// <summary>
-    /// Guarda la imagen en wwwroot/uploads/celulas y devuelve la ruta pública relativa.
+    /// Sube la imagen (Blob Storage o local) y devuelve la URL pública.
     /// </summary>
     private async Task<(string? ruta, string? error)> GuardarImagenAsync(IFormFile imagen)
     {
@@ -89,18 +89,10 @@ public class CelulasModel : PageModel
         if (imagen.Length > TamanoMaximoBytes)
             return (null, "La imagen supera el tamaño máximo de 5 MB.");
 
-        var carpeta = Path.Combine(_env.WebRootPath, "uploads", "celulas");
-        Directory.CreateDirectory(carpeta);
-
         var nombreArchivo = $"celula_{Guid.NewGuid():N}{extension}";
-        var rutaFisica = Path.Combine(carpeta, nombreArchivo);
-
-        await using (var stream = new FileStream(rutaFisica, FileMode.Create))
-        {
-            await imagen.CopyToAsync(stream);
-        }
-
-        return ($"/uploads/celulas/{nombreArchivo}", null);
+        await using var stream = imagen.OpenReadStream();
+        var url = await _imagenes.SubirAsync(stream, nombreArchivo, "celulas", imagen.ContentType);
+        return (url, null);
     }
 
     private async Task CargarAsync()
