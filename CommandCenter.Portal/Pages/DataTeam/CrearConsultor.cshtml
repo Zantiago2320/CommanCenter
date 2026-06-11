@@ -67,7 +67,7 @@
 
                 <div class="col-12">
                     <label class="form-label">
-                        Células <span class="text-muted small">(puede seleccionar una o varias)</span>
+                        Células <span class="text-muted small">(puede agregar una o varias)</span>
                     </label>
                     @if (Model.CelulasDisponibles.Count == 0)
                     {
@@ -77,24 +77,20 @@
                     }
                     else
                     {
-                        <div class="row g-2">
-                            @foreach (var celula in Model.CelulasDisponibles)
-                            {
-                                <div class="col-md-4">
-                                    <div class="form-check border rounded p-2 ps-4 h-100">
-                                        <input class="form-check-input" type="checkbox"
-                                               name="Input.CelulasIds" value="@celula.Id"
-                                               id="celula_@celula.Id" />
-                                        <label class="form-check-label d-flex align-items-center gap-2"
-                                               for="celula_@celula.Id">
-                                            <span class="rounded-circle d-inline-block"
-                                                  style="width:12px;height:12px;background:@celula.Color"></span>
-                                            @celula.Nombre
-                                        </label>
-                                    </div>
-                                </div>
-                            }
+                        <div class="d-flex gap-2 align-items-start flex-wrap">
+                            <select id="selectorCelula" class="form-select" style="max-width: 320px;">
+                                <option value="">— Seleccionar célula —</option>
+                                @foreach (var celula in Model.CelulasDisponibles)
+                                {
+                                    <option value="@celula.Id" data-color="@celula.Color">@celula.Nombre</option>
+                                }
+                            </select>
+                            <button type="button" id="btnAgregarCelula" class="btn btn-outline-primary">
+                                <i class="bi bi-plus-lg me-1"></i>Agregar
+                            </button>
                         </div>
+                        <div id="celulasSeleccionadas" class="d-flex flex-wrap gap-2 mt-2"></div>
+                        <input type="hidden" id="celulasIdsContainer" />
                     }
                 </div>
 
@@ -121,3 +117,66 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const selector = document.getElementById('selectorCelula');
+            const btnAgregar = document.getElementById('btnAgregarCelula');
+            const contenedor = document.getElementById('celulasSeleccionadas');
+            if (!selector || !btnAgregar || !contenedor) return;
+
+            const seleccionadas = new Set();
+
+            function render() {
+                contenedor.innerHTML = '';
+                seleccionadas.forEach(id => {
+                    const opt = selector.querySelector(`option[value="${id}"]`);
+                    if (!opt) return;
+                    const color = opt.getAttribute('data-color') || '#6c757d';
+
+                    const tag = document.createElement('span');
+                    tag.className = 'badge d-inline-flex align-items-center gap-2 p-2';
+                    tag.style.background = color;
+                    tag.style.fontSize = '.85rem';
+
+                    const texto = document.createElement('span');
+                    texto.textContent = opt.textContent;
+                    tag.appendChild(texto);
+
+                    const cerrar = document.createElement('button');
+                    cerrar.type = 'button';
+                    cerrar.className = 'btn-close btn-close-white';
+                    cerrar.style.fontSize = '.6rem';
+                    cerrar.setAttribute('aria-label', 'Quitar');
+                    cerrar.addEventListener('click', () => {
+                        seleccionadas.delete(id);
+                        render();
+                    });
+                    tag.appendChild(cerrar);
+
+                    const hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'Input.CelulasIds';
+                    hidden.value = id;
+                    tag.appendChild(hidden);
+
+                    contenedor.appendChild(tag);
+                });
+
+                // Deshabilitar en el selector las ya agregadas
+                Array.from(selector.options).forEach(o => {
+                    if (o.value) o.disabled = seleccionadas.has(o.value);
+                });
+            }
+
+            btnAgregar.addEventListener('click', () => {
+                const id = selector.value;
+                if (!id) return;
+                seleccionadas.add(id);
+                selector.value = '';
+                render();
+            });
+        })();
+    </script>
+}
