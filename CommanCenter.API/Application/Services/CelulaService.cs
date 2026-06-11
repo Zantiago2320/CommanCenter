@@ -76,8 +76,22 @@ public class CelulaService : ICelulaService
 
     public async Task<ApiResponse<bool>> EliminarAsync(int id, string usuarioId)
     {
-        var celula = await _repo.GetByIdAsync(id);
+        var celula = await _repo.GetWithMiembrosAsync(id);
         if (celula is null) return ApiResponse<bool>.NotFound("Célula");
+
+        // Validación 1: No permitir eliminar células especiales
+        var celulasSinEliminacion = new[] { "Sin asignación" };
+        if (celulasSinEliminacion.Contains(celula.Nombre))
+            return ApiResponse<bool>.Fail($"No se puede eliminar la célula '{celula.Nombre}' — es obligatoria en el sistema.");
+
+        // Validación 2: No permitir eliminar si tiene miembros asignados
+        if (celula.Miembros.Any())
+        {
+            var totalMiembros = celula.Miembros.Count;
+            return ApiResponse<bool>.Fail(
+                $"No se puede eliminar '{celula.Nombre}' — tiene {totalMiembros} miembro(s) asignado(s). " +
+                "Reasigne los miembros antes de intentar eliminarla.");
+        }
 
         celula.Activo = false;
         celula.FechaModificacion = DateTime.UtcNow;
@@ -87,9 +101,12 @@ public class CelulaService : ICelulaService
         await _repo.SaveChangesAsync();
 
         await _auditoria.RegistrarAsync("DataTeam", "DELETE", "Celula",
-            id.ToString(), celula.Nombre, null, usuarioId, null, null);
+            id.ToString(), celula.Nombre, $"Eliminada por {usuarioId}", usuarioId, null, null);
 
-        return ApiResponse<bool>.Ok(true, "Célula eliminada.");
+        _logger.LogInformation("Célula {CelulaId} '{NombreCelula}' eliminada por {Usuario}",
+            id, celula.Nombre, usuarioId);
+
+        return ApiResponse<bool>.Ok(true, $"Célula '{celula.Nombre}' eliminada.");
     }
 
     public async Task<ApiResponse<bool>> AsignarMiembroAsync(int celulaId, int consultorId, string usuarioId)
